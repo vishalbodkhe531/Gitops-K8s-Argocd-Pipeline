@@ -2,7 +2,7 @@
   "name": "gitops-k8s-argocd-pipeline",
   "version": "1.0.0",
   "description": "Start Project",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/app.ts",
     "build": "tsc",
