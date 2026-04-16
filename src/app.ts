@@ -8,7 +8,7 @@ app.use(express.json());
 app.get("/", (req: Request, res: Response) => {
   res.json({
     status: "success-200",
-    message: "Auto Deploy Working via ArgoCD + GitHub Actions",
+    message: "Auto Deploy Working via ArgoCD + GitHub Actions (change-1.0)",
     service: "nodejs-gitops-k8s-argocd-pipeline",
   });
 });
