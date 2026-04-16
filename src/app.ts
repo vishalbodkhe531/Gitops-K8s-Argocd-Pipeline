@@ -8,7 +8,7 @@ app.use(express.json());
 app.get("/", (req: Request, res: Response) => {
   res.json({
     status: "success-200",
-    message: "Welcome to the Node.js GitOps CI/CD pipeline powered by ArgoCD",
+    message: "Auto Deploy Working via ArgoCD + GitHub Actions",
     service: "nodejs-gitops-k8s-argocd-pipeline",
   });
 });
