@@ -4,13 +4,12 @@ on:
 push:
 branches:
 - master
-paths:
-- '**/*'
 
 jobs:
 build-and-deploy:
 runs-on: ubuntu-latest
 
+```
 steps:
   - name: Checkout code
     uses: actions/checkout@v3
@@ -39,3 +38,4 @@ steps:
       git commit -m "Update image tag" || echo "No changes to commit"
       git pull --rebase
       git push
+```

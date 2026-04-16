@@ -12,8 +12,8 @@
 
 6] kubectl port-forward service/argocd-pipeline 8888:5000 -> we can run our application 
 
-7] make pipline using gitHub action and pull .github/workflows folder
+7] make pipeline using gitHub action and pull .github/workflows folder
 
-8] add pipline in main.yml file 
+8] add pipeline in main.yml file 
 
 9] create token in docker and also set password and userName in gitHub action
