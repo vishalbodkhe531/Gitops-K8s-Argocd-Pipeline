@@ -5,6 +5,9 @@ on:
     branches:
       - master
 
+permissions:
+  contents: write
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -36,4 +39,4 @@ jobs:
           git add k8s/deployment.yaml
           git commit -m "Update image tag" || echo "No changes to commit"
           git pull --rebase
-          git push
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
