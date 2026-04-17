@@ -12,37 +12,6 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
-    # steps:
-    #   - name: Checkout code
-    #     uses: actions/checkout@v3
-
-    #   - name: Login to DockerHub
-    #     uses: docker/login-action@v2
-    #     with:
-    #       username: ${{ secrets.DOCKER_USERNAME }}
-    #       password: ${{ secrets.DOCKER_PASSWORD }}
-
-    #   - name: Build Docker image
-    #     run: docker build -t vishalbodkhe532/argocd-pipeline:${{ github.sha }} .
-
-    #   - name: Push Docker image
-    #     run: docker push vishalbodkhe532/argocd-pipeline:${{ github.sha }}
-
-    #   - name: Update Kubernetes YAML
-    #     run: |
-    #       IMAGE_TAG=${{ github.sha }}
-    #       sed -i "s|image: vishalbodkhe532/argocd-pipeline:.*|image: vishalbodkhe532/argocd-pipeline:$IMAGE_TAG|g" k8s/deployment.yaml
-    #       cat k8s/deployment.yaml
-
-    #   - name: Commit and Push changes
-    #     run: |
-    #       git config --global user.name "github-actions"
-    #       git config --global user.email "actions@github.com"
-    #       git add k8s/deployment.yaml
-    #       git commit -m "Update image tag" || echo "No changes to commit"
-    #       git pull --rebase
-    #       git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -59,21 +28,23 @@ jobs:
       - name: Push Docker image
         run: docker push vishalbodkhe532/argocd-pipeline:${{ github.sha }}
 
-      # 👇 DEBUG BEFORE
       - name: Show file before update
         run: cat k8s/deployment.yaml
 
-      # 👇 UPDATE
+      # - name: Update Kubernetes YAML
+      #   run: |
+      #     IMAGE_TAG=${{ github.sha }}
+      #     sed -i "s|argocd-pipeline:.*|argocd-pipeline:$IMAGE_TAG|g" k8s/deployment.yaml
+
       - name: Update Kubernetes YAML
         run: |
           IMAGE_TAG=${{ github.sha }}
           sed -i "s|argocd-pipeline:.*|argocd-pipeline:$IMAGE_TAG|g" k8s/deployment.yaml
+          cat k8s/deployment.yaml
 
-      # 👇 DEBUG AFTER
       - name: Show file after update
         run: cat k8s/deployment.yaml
 
-      # 👇 COMMIT
       - name: Commit and Push changes
         run: |
           git config --global user.name "github-actions"
