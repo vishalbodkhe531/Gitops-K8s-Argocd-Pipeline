@@ -31,17 +31,33 @@ jobs:
       - name: Show file before update
         run: cat k8s/deployment.yaml
 
+      # - name: Update Kubernetes YAML
+      #   run: |
+      #     IMAGE_TAG=${{ github.sha }}
+      #     sed -i "s|image: vishalbodkhe532/argocd-pipeline:.*|image: vishalbodkhe532/argocd-pipeline:${IMAGE_TAG}|g" k8s/deployment.yaml
+      #     cat k8s/deployment.yaml
+
       - name: Update Kubernetes YAML
         run: |
           IMAGE_TAG=${{ github.sha }}
-          sed -i "s|image: vishalbodkhe532/argocd-pipeline:.*|image: vishalbodkhe532/argocd-pipeline:${IMAGE_TAG}|g" k8s/deployment.yaml
+          sed -i "s|image: .*/argocd-pipeline:.*|image: vishalbodkhe532/argocd-pipeline:${IMAGE_TAG}|g" k8s/deployment.yaml
           cat k8s/deployment.yaml
 
       - name: Show file after update
         run: cat k8s/deployment.yaml
 
+      # - name: Commit and Push changes
+      #   run: |
+      #     git config --global user.name "github-actions"
+      #     git config --global user.email "actions@github.com"
+      #     git add k8s/deployment.yaml
+      #     git commit -m "Update image tag-${IMAGE_TAG}" || echo "No changes to commit"
+      #     git pull --rebase
+      #     git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+
       - name: Commit and Push changes
         run: |
+          IMAGE_TAG=${{ github.sha }}
           git config --global user.name "github-actions"
           git config --global user.email "actions@github.com"
           git add k8s/deployment.yaml
