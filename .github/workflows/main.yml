@@ -102,34 +102,39 @@ jobs:
         run: |
           IMAGE_TAG=${{ github.sha }}
           
-          # Remove BOM and update image tag using python3
           python3 << 'EOF'
           import re, os
           
           filepath = 'k8s/deployment.yaml'
-          
-          with open(filepath, 'rb') as f:
-              content = f.read()
-          
-          # Remove BOM if present
-          content = content.replace(b'\xef\xbb\xbf', b'')
-          
-          # Decode to string
-          text = content.decode('utf-8')
-          
-          # Replace image tag
           image_tag = os.environ['IMAGE_TAG']
+          
+          # Read as raw bytes
+          with open(filepath, 'rb') as f:
+              raw = f.read()
+          
+          # Print what we see at start of file
+          print("First 10 bytes:", raw[:10])
+          
+          # Remove any BOM variants
+          raw = raw.replace(b'\xff\xfe', b'')  # UTF-16 LE BOM
+          raw = raw.replace(b'\xfe\xff', b'')  # UTF-16 BE BOM
+          raw = raw.replace(b'\xef\xbb\xbf', b'')  # UTF-8 BOM
+          
+          # Decode
+          text = raw.decode('utf-16-le') if b'\x00' in raw[:20] else raw.decode('utf-8', errors='ignore')
+          
+          # Replace image line
           text = re.sub(
-            r'image:.*argocd-pipeline:.*',
-            f'image: vishalbodkhe532/argocd-pipeline:{image_tag}',
-            text
+              r'image:.*argocd-pipeline:.*',
+              f'image: vishalbodkhe532/argocd-pipeline:{image_tag}',
+              text
           )
           
-          # Write back
+          # Write back as clean UTF-8
           with open(filepath, 'w', encoding='utf-8') as f:
               f.write(text)
           
-          print("Done! New content:")
+          print("Success! Updated content:")
           print(text)
           EOF
 
