@@ -40,7 +40,7 @@ jobs:
       - name: Update Kubernetes YAML
         run: |
           IMAGE_TAG=${{ github.sha }}
-          sed -i "s|image: vishalbodkhe532/argocd-pipeline:.*|image: vishalbodkhe532/argocd-pipeline:${IMAGE_TAG}|g" k8s/deployment.yaml
+          sed -i "s|argocd-pipeline:.*|argocd-pipeline:${IMAGE_TAG}|g" k8s/deployment.yaml
           cat k8s/deployment.yaml
 
       - name: Show file after update
