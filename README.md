@@ -11,6 +11,8 @@ A step-by-step guide to deploying ArgoCD on Kubernetes and setting up a CI/CD pi
 - [Accessing the ArgoCD UI](#accessing-the-argocd-ui)
 - [Exposing Your Application](#exposing-your-application)
 - [CI/CD Pipeline with GitHub Actions](#cicd-pipeline-with-github-actions)
+- [Quick Reference](#quick-reference)
+- [Resources](#resources)
 
 ---
 
@@ -28,7 +30,7 @@ kubectl cluster-info
 
 ## ArgoCD Installation
 
-### Step 1 — Create the ArgoCD namespace
+### Step 1 — Create the ArgoCD Namespace
 
 Creates a dedicated namespace to isolate all ArgoCD resources from your application workloads.
 
@@ -50,19 +52,39 @@ Wait for all pods to be ready before proceeding:
 kubectl get pods -n argocd -w
 ```
 
+Verify all resources are running:
+
+```bash
+kubectl get all -n argocd
+```
+
 ---
 
 ## Accessing the ArgoCD UI
 
-### Step 3 — Port-forward the ArgoCD server
+### Step 3 — Expose the ArgoCD Server
 
-Forwards local port `8080` to the ArgoCD server's HTTPS port `443`. After running this command, open [https://localhost:8080](https://localhost:8080) in your browser.
+Convert the ArgoCD server service to NodePort so it can be accessed externally:
+
+```bash
+kubectl expose svc argocd-server -n argocd --type=NodePort --name=argocd-server-nodeport
+```
+
+Start the Minikube service to get the accessible URL:
+
+```bash
+minikube service argocd-server -n argocd
+```
+
+Alternatively, port-forward the ArgoCD server directly (forwards local port `8080` to HTTPS port `443`):
 
 ```bash
 kubectl port-forward service/argocd-server -n argocd 8080:443
 ```
 
-### Step 4 — Retrieve the initial admin password
+Then open [https://localhost:8080](https://localhost:8080) in your browser.
+
+### Step 4 — Retrieve the Initial Admin Password
 
 ArgoCD auto-generates an initial password for the `admin` user, stored as a Kubernetes secret.
 
@@ -84,21 +106,23 @@ kubectl get secret argocd-initial-admin-secret -n argocd -o jsonpath="{.data.pas
 
 ## Exposing Your Application
 
-### Step 5 — Port-forward the application service
+### Step 5 — Port-Forward the Application Service
 
-Once ArgoCD has deployed your application, expose it locally by forwarding port `8888` to the container's port `5000`. Visit [http://localhost:8888](http://localhost:8888) to access your running app.
+Once ArgoCD has deployed your application, expose it locally by forwarding port `8888` to the container's port `5000`:
 
 ```bash
 kubectl port-forward service/argocd-pipeline 8888:5000
 ```
 
-> Replace `argocd-pipeline` with the name of your actual Kubernetes service if it differs.
+Visit [http://localhost:8888](http://localhost:8888) to access your running app.
+
+> **Note:** Replace `argocd-pipeline` with the name of your actual Kubernetes service if it differs.
 
 ---
 
 ## CI/CD Pipeline with GitHub Actions
 
-### Step 6 — Add the workflow folder
+### Step 6 — Add the Workflow Folder
 
 Create the GitHub Actions workflow directory in your repository if it does not already exist:
 
@@ -106,16 +130,14 @@ Create the GitHub Actions workflow directory in your repository if it does not a
 mkdir -p .github/workflows
 ```
 
-Pull or sync the `.github/workflows/` folder from your repository to get the existing pipeline definitions.
-
-### Step 7 — Configure the pipeline
+### Step 7 — Configure the Pipeline
 
 Edit `.github/workflows/main.yml` to define your CI/CD steps. A typical pipeline includes:
 
-1.  Checkout the source code
-2.  Log in to Docker Hub
-3.  Build and push the Docker image
-4.  Trigger an ArgoCD sync (or rely on ArgoCD's automatic sync policy)
+1. Checkout the source code
+2. Log in to Docker Hub
+3. Build and push the Docker image
+4. Trigger an ArgoCD sync (or rely on ArgoCD's automatic sync policy)
 
 ```yaml
 name: CI/CD Pipeline
@@ -145,11 +167,11 @@ jobs:
           tags: your-dockerhub-username/your-image-name:latest
 ```
 
-### Step 8 — Add Docker Hub credentials to GitHub secrets
+### Step 8 — Add Docker Hub Credentials to GitHub Secrets
 
 In your GitHub repository, go to **Settings → Secrets and variables → Actions** and add the following repository secrets:
 
-| Secret name       | Description                                           |
+| Secret Name       | Description                                           |
 | ----------------- | ----------------------------------------------------- |
 | `DOCKER_USERNAME` | Your Docker Hub username                              |
 | `DOCKER_PASSWORD` | A Docker Hub access token (not your account password) |
@@ -160,13 +182,15 @@ In your GitHub repository, go to **Settings → Secrets and variables → Action
 
 ## Quick Reference
 
-| Command                                                     | Purpose                   |
-| ----------------------------------------------------------- | ------------------------- |
-| `kubectl create namespace argocd`                           | Create ArgoCD namespace   |
-| `kubectl apply -n argocd -f <url>`                          | Install ArgoCD            |
-| `kubectl get pods -n argocd -w`                             | Watch ArgoCD pods come up |
-| `kubectl port-forward svc/argocd-server -n argocd 8080:443` | Access ArgoCD UI          |
-| `kubectl port-forward svc/argocd-pipeline 8888:5000`        | Access your application   |
+| Command                                                       | Purpose                        |
+| ------------------------------------------------------------- | ------------------------------ |
+| `kubectl create namespace argocd`                             | Create ArgoCD namespace        |
+| `kubectl apply -n argocd -f <url>`                            | Install ArgoCD                 |
+| `kubectl get pods -n argocd -w`                               | Watch ArgoCD pods come up      |
+| `kubectl get all -n argocd`                                   | Verify all resources           |
+| `kubectl port-forward svc/argocd-server -n argocd 8080:443`  | Access ArgoCD UI               |
+| `kubectl port-forward svc/argocd-pipeline 8888:5000`          | Access your application        |
+| `minikube service argocd-server -n argocd`                    | Start Minikube service         |
 
 ---
 
