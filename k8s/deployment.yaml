@@ -17,6 +17,6 @@ spec:
     spec:
       containers:
       - name: argocd-pipeline
-        image: vishalbodkhe532/argocd-pipeline:53c4f380fd3357a2953a506b907a88c8387f7bf8
+        image: vishalbodkhe532/argocd-pipeline:1f9a638759c903995cb280526a0b98288fbe3ecc
         resources: {}
 status: {}
